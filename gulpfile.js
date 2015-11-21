@@ -2,6 +2,9 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var source = require('vinyl-source-stream');
 var browserify = require('browserify');
+var envify = require('envify');
+var inject = require('gulp-inject');
+
 var watchify = require('watchify');
 var reactify = require('reactify');
 var notifier = require('node-notifier');
@@ -32,9 +35,13 @@ var notify = function(error) {
   notifier.notify({title: title, message: message});
 };
 
+
+var envParams = {};
+
 var bundler = watchify(browserify({
   entries: ['./src/app.jsx'],
-  transform: [reactify],
+  transform: [
+    'reactify'],
   extensions: ['.jsx'],
   debug: true,
   cache: {},
@@ -70,6 +77,14 @@ gulp.task('serve', function(done) {
       },
       open: true
     }));
+});
+
+
+/* testing  injectjs */
+gulp.task('injectJS', function() {
+  gulp.src('index.html')
+    .pipe(inject(gulp.src('./src/importantFile.js', {read: false}), {name: 'head'}))
+    .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('sass', function () {
